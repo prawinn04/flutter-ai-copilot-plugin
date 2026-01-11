@@ -1,93 +1,134 @@
 # Flutter UI Copilot 🤖
 
-> **A Flutter plugin that gives your app "Vision" and "Control".**  
-> Empower your users to interact with your app using natural language (e.g., "Click the add button", "Go to settings").
+> **"Give your App Eyes and Hands"**  
+> Empower your users to interact with your Flutter app using natural language. This plugin connects your UI to Multimodal AI (like OpenAI GPT-4o, Gemini, or Qwen2.5-VL), allowing the AI to "see" the screen and "click" widgets automatically.
 
 ![Flutter](https://img.shields.io/badge/Flutter-Tested-02569B?logo=flutter)
 ![License](https://img.shields.io/badge/License-Proprietary%20%2F%20Non--Commercial-red)
+![Pub Version](https://img.shields.io/pub/v/flutter_ui_copilot)
 
-## ✨ Features
+## ✨ Advantages
 
-*   **👁️ Visual Understanding**: Automatically captures screenshots and sends them to Multimodal AI (OpenAI, Gemini, Hugging Face).
-*   **🖱️ Auto-Pilot**: The AI can **highlight** widgets and automatically **click/tap** them to perform actions.
-*   **🔌 Multi-Provider**: Support for:
-    *   **Google Gemini** (Flash 1.5)
-    *   **Hugging Face** (Qwen2.5-VL for vision, Gemma/DeepSeek for text)
-    *   **OpenAI** (GPT-4o)
-    *   **GitHub Copilot** (Enterprise)
+*   **⚡ Zero-Training**: No need to train custom models. It works with standard Multimodal LLMs.
+*   **👁️ Visual Understanding**: The AI sees exactly what the user sees (screenshots).
+*   **🖱️ Auto-Pilot**: It can find widgets and **click** them for the user.
+*   **🔌 Multi-Provider**: Switch between OpenAI, Google Gemini, Hugging Face, or GitHub Copilot easily.
+*   **🛠️ Simple Integration**: Just wrap widgets with `CopilotTag`. No complex accessibility trees or XPaths.
+
+---
 
 ## 🚀 Installation
 
-Add the plugin to your `pubspec.yaml` (local path for now):
+Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_ui_copilot:
-    path: ./path/to/flutter_ui_copilot
+  flutter_ui_copilot: ^0.0.1
 ```
 
-## 🛠️ Usage
+Or install it from the command line:
 
-### 1. Initialize Provider
-Wrap your root `MaterialApp` with `CopilotProvider`.
+```bash
+flutter pub add flutter_ui_copilot
+```
+
+---
+
+## 📖 How to Integrate
+
+### 1. Initialize the Provider
+Wrap your root widget (usually `MaterialApp`) with `CopilotProvider`.
 
 ```dart
-CopilotProvider(
-  apiKey: "YOUR_API_KEY",
-  // Choose your provider
-  aiProvider: GeminiProvider(model: 'gemini-1.5-flash'),
-  // OR
-  // aiProvider: OpenAIProvider(
-  //   model: 'Qwen/Qwen2.5-VL-7B-Instruct',
-  //   baseUrl: 'https://router.huggingface.co/v1/chat/completions',
-  //   supportsImages: true,
-  // ),
-  child: MyApp(),
-)
+import 'package:flutter_ui_copilot/flutter_ui_copilot.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return CopilotProvider(
+      apiKey: "YOUR_API_KEY", // e.g., sk-...
+      // Select your AI Brain
+      aiProvider: OpenAIProvider(
+        model: 'gpt-4o', // or 'Qwen/Qwen2.5-VL-7B-Instruct'
+      ),
+      child: MaterialApp(
+        home: HomeScreen(),
+      ),
+    );
+  }
+}
 ```
 
-### 2. Tag Your Widgets
-Wrap interactive elements with `CopilotTag`. This tells the AI what the widget is and gives it a way to click it.
+### 2. Tag Interactive Widgets
+Wrap any button, text field, or widget you want the AI to control with `CopilotTag`.
 
 ```dart
 CopilotTag(
-  id: "increment_btn",
-  description: "Button to increase the count",
-  actionCallback: _incrementCounter, // logic to run when AI clicks this
+  id: "add_item_btn", // Unique ID
+  description: "Button to add a new item to the list", // Description for AI
+  actionCallback: () {
+     // This logic runs when AI decides to click this button
+     _addItem(); 
+  },
   child: FloatingActionButton(
-    onPressed: _incrementCounter,
-    child: Icon(Icons.add),
+    onPressed: _addItem,
+    child: const Icon(Icons.add),
   ),
 )
 ```
 
 ### 3. Send Commands
-Trigger the AI from anywhere (e.g., a chat input).
+You can trigger the AI from a chat input, a voice command, or a debug button.
 
 ```dart
+// Inside any widget
 final copilot = CopilotProvider.of(context);
-await copilot.sendMessage("Click the add button");
+
+// Example User Request
+await copilot.sendMessage("Add a new item for me");
+// The AI will "see" the screen, find the "add_item_btn", and trigger it.
 ```
-
-## 🧠 Supported Actions
-
-| Action | Description |
-| :--- | :--- |
-| **Highlight** | Draws a spotlight overlay on the target widget. |
-| **Click/Tap** | Highlights the widget and then executes the `actionCallback`. |
-| **Navigate** | Use `actionCallback` to `Navigator.push` or `pop` to handle screen changes naturally. |
-
-## ⚠️ Requirements
-
-*   **Internet Access**: Required for API calls.
-    *   *Android*: Ensure `<uses-permission android:name="android.permission.INTERNET"/>` is in `AndroidManifest.xml`.
-    *   *macOS*: Enable "Outgoing Connections (Client)" in Entitlements.
 
 ---
 
-## 📄 License & Restrictions
+## 🛠️ Tasks Performed
 
-**Copyright (c) 2026 Praveen Kumar. All rights reserved.**
+The plugin handles the complex "Vision-to-Action" loop for you:
 
-This software is for **Educational and Non-Commercial Use Only**. 
-The core concepts and ideas implemented herein are the intellectual property of the author. Commercial reproduction or usage is strictly prohibited.
+1.  **Capture**: Takes a screenshot of the current UI.
+2.  **Contextualize**: Collects descriptions of all `CopilotTag` widgets on screen.
+3.  **Reason**: Sends image + widget list to the AI (LLM).
+4.  **Action**:
+    *   **Highlight**: Draws a visual spotlight on the target widget.
+    *   **Execute**: Triggers the `actionCallback` (Click/Tap).
+    *   **Navigate**: Can push/pop routes if you wire the callback to `Navigator`.
+
+---
+
+## 🔮 Future Updates
+
+*   **🗣️ Voice Mode**: Talk to your app directly (Speech-to-Text integration).
+*   **📜 Scroll Support**: AI will be able to scroll lists to find off-screen items.
+*   **📝 Text Input**: AI will be able to type text into fields (e.g., "Fill the form with verify data").
+*   **🧠 Local Models**: Support for on-device small vision models for privacy.
+
+---
+
+## ⚠️ Important Notes
+
+*   **API Costs**: Using GPT-4o or Gemini may incur costs from the respective providers.
+*   **Permissions**: Ensure your app has Internet permission.
+    *   **Android**: `<uses-permission android:name="android.permission.INTERNET"/>`
+    *   **macOS**: Enable "Outgoing Connections (Client)".
+
+## 📄 License
+
+**Proprietary / Non-Commercial Use Only**
+Copyright (c) 2026 Praveen Kumar. All rights reserved.
+See `LICENSE` file for details.

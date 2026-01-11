@@ -1,7 +1,8 @@
 name: flutter_ui_copilot
-description: "A new Flutter plugin project."
+description: "Enable AI-powered UI interactions in your Flutter app. Let users control your app with natural language using Vision and LLMs."
 version: 0.0.1
-homepage:
+homepage: https://github.com/prawinn04/flutter-ai-copilot-plugin
+repository: https://github.com/prawinn04/flutter-ai-copilot-plugin
 
 environment:
   sdk: ^3.10.4
