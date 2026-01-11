@@ -127,6 +127,17 @@ The plugin handles the complex "Vision-to-Action" loop for you:
     *   **Android**: `<uses-permission android:name="android.permission.INTERNET"/>`
     *   **macOS**: Enable "Outgoing Connections (Client)".
 
+## 🆘 Support
+
+Contact the developer for support, contributions, or updates:
+
+*   **Developer**: Praveen
+*   **Email**: praveenvenkat042k@gmail.com
+*   **Portfolio**: [praveen-dev.space](https://praveen-dev.space)
+*   **Issues**: [GitHub Issues](https://github.com/prawinn04/flutter-ai-copilot-plugin/issues)
+
+---
+
 ## 📄 License
 
 **Proprietary / Non-Commercial Use Only**
